@@ -1,507 +1,61 @@
-GlueCreditsSoundKits = { };
-GlueCreditsSoundKits[1] = "Menu-Credits01";
-GlueCreditsSoundKits[2] = "Menu-Credits02";
-GlueCreditsSoundKits[3] = "Menu-Credits03";
-GlueCreditsSoundKits[4] = "Menu-Credits04";
-GlueCreditsSoundKits[5] = "Menu-Credits05";
-GlueCreditsSoundKits[6] = "Menu-Credits06";
 
+GLUE_SCREENS = {
+	["login"] = 		{ frame = "AccountLogin", 		playMusic = true,	playAmbience = true },
+	["realmlist"] = 	{ frame = "RealmListUI", 		playMusic = true,	playAmbience = false },
+	["charselect"] = 	{ frame = "CharacterSelect",	playMusic = true,	playAmbience = false, onAttemptShow = function() InitializeCharacterScreenData() end },
+	["charcreate"] =	{ frame = "CharacterCreate",	playMusic = true,	playAmbience = false, onAttemptShow = function() InitializeCharacterScreenData() end },
+	["kioskmodesplash"]={ frame = "KioskModeSplash",	playMusic = true,	playAmbience = false },
+};
 
-GlueScreenInfo = { };
-GlueScreenInfo["login"]			= "AccountLogin";
-GlueScreenInfo["charselect"]	= "CharacterSelect";
-GlueScreenInfo["realmwizard"]	= "RealmWizard";
-GlueScreenInfo["realmlist"]		= "RealmListUI";
-GlueScreenInfo["charcreate"]	= "CharacterCreate";
-GlueScreenInfo["patchdownload"]	= "PatchDownload";
-GlueScreenInfo["trialconvert"]	= "TrialConvert";
-GlueScreenInfo["movie"]			= "MovieFrame";
-GlueScreenInfo["credits"]		= "CreditsFrame";
-GlueScreenInfo["options"]		= "OptionsFrame";
+GLUE_SECONDARY_SCREENS = {
+	["cinematics"] =	{ frame = "CinematicsFrame", 	playMusic = true,	playAmbience = false,	fullScreen = false,	showSound = "gsTitleOptions" },
+	["credits"] = 		{ frame = "CreditsFrame", 		playMusic = false,	playAmbience = false,	fullScreen = true,	showSound = "gsTitleCredits" },
+	["movie"] = 		{ frame = "MovieFrame", 		playMusic = false,	playAmbience = false,	fullScreen = true,	showSound = "gsTitleOptionOK" },
+	["options"] = 		{ frame = "VideoOptionsFrame",	playMusic = true,	playAmbience = false,	fullScreen = false,	showSound = "gsTitleOptions" },
+};
 
-CharModelFogInfo = { };
-CharModelFogInfo["SCOURGE"] = { r=0, g=0.22, b=0.22, far=26 };
---[[
-CharModelFogInfo["HUMAN"] = { r=0.8, g=0.65, b=0.73, far=222 };
-CharModelFogInfo["ORC"] = { r=0.5, g=0.5, b=0.5, far=270 };
-CharModelFogInfo["DWARF"] = { r=0.85, g=0.88, b=1.0, far=500 };
-CharModelFogInfo["NIGHTELF"] = { r=0.25, g=0.22, b=0.55, far=611 };
-CharModelFogInfo["TAUREN"] = { r=1.0, g=0.61, b=0.42, far=153 };
-CharModelFogInfo["CHARACTERSELECT"] = { r=0.8, g=0.65, b=0.73, far=222 };
-]]
-
-CharModelGlowInfo = { };
---[[CharModelGlowInfo["WORGEN"] = 0.0;
-CharModelGlowInfo["GOBLIN"] = 0.0;
-CharModelGlowInfo["HUMAN"] = 0.15;
-CharModelGlowInfo["DWARF"] = 0.15;
-CharModelGlowInfo["CHARACTERSELECT"] = 0.3;
-]]
-GlueAmbienceTracks = { };
-GlueAmbienceTracks["HUMAN"] = "AMB_GlueScreen_Human";
-GlueAmbienceTracks["ORC"] = "AMB_GlueScreen_Orc";
-GlueAmbienceTracks["TROLL"] = "AMB_GlueScreen_Troll";
-GlueAmbienceTracks["DWARF"] = "AMB_GlueScreen_Dwarf";
-GlueAmbienceTracks["GNOME"] = "AMB_GlueScreen_Gnome";
-GlueAmbienceTracks["TAUREN"] = "AMB_GlueScreen_Tauren";
-GlueAmbienceTracks["SCOURGE"] = "AMB_GlueScreen_Undead";
-GlueAmbienceTracks["NIGHTELF"] = "AMB_GlueScreen_NightElf";
-GlueAmbienceTracks["DRAENEI"] = "AMB_GlueScreen_Draenei";
-GlueAmbienceTracks["BLOODELF"] = "AMB_GlueScreen_BloodElf";
-GlueAmbienceTracks["GOBLIN"] = "AMB_GlueScreen_Goblin";
-GlueAmbienceTracks["WORGEN"] = "AMB_GlueScreen_Worgen";
-GlueAmbienceTracks["DEATHKNIGHT"] = "AMB_GlueScreen_Deathknight";
-GlueAmbienceTracks["CHARACTERSELECT"] = "GlueScreenIntro";
-GlueAmbienceTracks["PANDAREN"] = "AMB_GlueScreen_Pandaren";
-GlueAmbienceTracks["HORDE"] = "AMB_50_GlueScreen_HORDE";
-GlueAmbienceTracks["ALLIANCE"] = "AMB_50_GlueScreen_ALLIANCE";
-GlueAmbienceTracks["NEUTRAL"] = "AMB_50_GlueScreen_PANDAREN_NEUTRAL";
-GlueAmbienceTracks["PANDARENCHARACTERSELECT"] = "AMB_50_GlueScreen_PANDAREN_NEUTRAL";
-
--- indicies for adding lights ModelFFX:Add*Light
-LIGHT_LIVE  = 0;
-LIGHT_GHOST = 1;
-
--- Alpha animation stuff
-FADEFRAMES = {};
-CURRENT_GLUE_SCREEN = nil;
-PENDING_GLUE_SCREEN = nil;
--- Time in seconds to fade
-LOGIN_FADE_IN = 0.75;
-LOGIN_FADE_OUT = 0.5;
-CHARACTER_SELECT_FADE_IN = 0.75;
-RACE_SELECT_INFO_FADE_IN = .5;
-RACE_SELECT_INFO_FADE_OUT = .5;
-
--- Realm Split info
-SERVER_SPLIT_SHOW_DIALOG = false;
-SERVER_SPLIT_CLIENT_STATE = -1;	--	-1 uninitialized; 0 - no choice; 1 - realm 1; 2 - realm 2
-SERVER_SPLIT_STATE_PENDING = -1;	--	-1 uninitialized; 0 - no server split; 1 - server split (choice mode); 2 - server split (no choice mode)
-SERVER_SPLIT_DATE = nil;
-
--- Account Messaging info
-ACCOUNT_MSG_NUM_AVAILABLE = 0;
-ACCOUNT_MSG_PRIORITY = 0;
-ACCOUNT_MSG_HEADERS_LOADED = false;
-ACCOUNT_MSG_BODY_LOADED = false;
-ACCOUNT_MSG_CURRENT_INDEX = nil;
-
--- Gender Constants
 SEX_NONE = 1;
 SEX_MALE = 2;
 SEX_FEMALE = 3;
 
---Logos
-EXPANSION_LOGOS = {
-	TRIAL = "Interface\\Glues\\Common\\Glues-WoW-StarterLogo",
-	VETERAN = "Interface\\Glues\\Common\\GLUES-WOW-WODLOGO",
-	[1] = "Interface\\Glues\\Common\\Glues-WoW-ClassicLogo",
-	[2] = "Interface\\Glues\\Common\\Glues-WoW-WotLKLogo",
-	[3] = "Interface\\Glues\\Common\\Glues-WoW-CCLogo",
-	[4] = "Interface\\Glues\\Common\\Glues-WoW-MPLogo",
-	[5] = "Interface\\Glues\\Common\\GLUES-WOW-WODLOGO",
-	--When adding entries to here, make sure to update the zhTW and zhCN localization files.
-};
-
---Login Screen Ambience
-EXPANSION_GLUE_AMBIENCE = {
-	TRIAL = "GlueScreenIntro",
-	VETERAN = "GlueScreenIntro",
-	[1] = "GlueScreenIntro",
-	[2] = "GlueScreenIntro",
-	[3] = "GlueScreenIntro",
-	[4] = "GlueScreenIntro",
-	[5] = "AMB_GlueScreen_WarlordsofDraenor",
-}
-
---Music
-EXPANSION_GLUE_MUSIC = {
-	TRIAL = "GS_Cataclysm",
-	VETERAN = "GS_Cataclysm",
-	[1] = "MUS_1.0_MainTitle_Original",
-	[2] = "GS_Cataclysm",
-	[3] = "GS_Cataclysm",
-	[4] = "MUS_50_HeartofPandaria_MainTitle",
-	[5] = "MUS_60_MainTitle",
-}
-
---Backgrounds
-EXPANSION_HIGH_RES_BG = {
-	TRIAL = "Interface\\Glues\\Models\\UI_MainMenu_Cataclysm\\UI_MainMenu_Cataclysm.m2",
-	VETERAN = "Interface\\Glues\\Models\\UI_MainMenu_Cataclysm\\UI_MainMenu_Warlords.m2",
-	[1] = "Interface\\Glues\\Models\\UI_MAINMENU\\UI_MainMenu.m2",
-	[2] = "Interface\\Glues\\Models\\UI_MainMenu_Cataclysm\\UI_MainMenu_Cataclysm.m2",
-	[3] = "Interface\\Glues\\Models\\UI_MainMenu_Cataclysm\\UI_MainMenu_Cataclysm.m2",
-	[4] = "Interface\\Glues\\Models\\UI_MainMenu_Pandaria\\UI_MainMenu_Pandaria.m2",
-	[5] = "Interface\\Glues\\Models\\UI_MainMenu_Warlords\\UI_MainMenu_Warlords.m2",
-}
-
-EXPANSION_LOW_RES_BG = {
-	TRIAL =  "Interface\\Glues\\Models\\UI_MainMenu_Cata_LowBandwidth\\UI_MainMenu_Cata_LowBandwidth.m2",
-	VETERAN =  "Interface\\Glues\\Models\\UI_MainMenu_Cata_LowBandwidth\\UI_MainMenu_Warlords_LowBandwidth.m2",
-	[1] =  "Interface\\Glues\\Models\\UI_MAINMENU\\UI_MainMenu.m2",
-	[2] =  "Interface\\Glues\\Models\\UI_MainMenu_Cata_LowBandwidth\\UI_MainMenu_Cata_LowBandwidth.m2",
-	[3] =  "Interface\\Glues\\Models\\UI_MainMenu_Cata_LowBandwidth\\UI_MainMenu_Cata_LowBandwidth.m2",
-	[4] =  "Interface\\Glues\\Models\\UI_MainMenu_LowBandwidth\\UI_MainMenu_LowBandwidth.m2",
-	[5] =  "Interface\\Glues\\Models\\UI_MainMenu_Warlords\\UI_MainMenu_Warlords_LowBandwidth.m2",
-}
-
---Credits titles
-CREDITS_TITLES = { --Note: These are off by 1 from the other expansion tables
-	CREDITS_WOW_CLASSIC,
-	CREDITS_WOW_BC,
-	CREDITS_WOW_LK,
-	CREDITS_WOW_CC,
-	CREDITS_WOW_MOP,
-	CREDITS_WOW_WOD,
-}
-
--- replace the C functions with local lua versions
-function getglobal(varr)
-	return _G[varr];
-end
-
-function setglobal(varr,value)
-	_G[varr] = value;
-end
-
-
-function SetGlueScreen(name)
-	local newFrame;
-	for index, value in pairs(GlueScreenInfo) do
-		local frame = _G[value];
-		if ( frame ) then
-			frame:Hide();
-			if ( index == name ) then
-				newFrame = frame;
-			end
-		end
-	end
-	
-	if ( newFrame ) then
-		newFrame:Show();
-		SetCurrentScreen(name);
-		SetCurrentGlueScreenName(name);
-		if ( name == "credits" ) then
-			PlayCreditsMusic( GlueCreditsSoundKits[CreditsFrame.creditsType] );
-			StopGlueAmbience();
-		elseif ( name ~= "movie" ) then
-			local displayedExpansionLevel = GetClientDisplayExpansionLevel();
-			PlayGlueMusic(EXPANSION_GLUE_MUSIC[displayedExpansionLevel]);
-			if (name == "login") then
-				PlayGlueAmbience(EXPANSION_GLUE_AMBIENCE[displayedExpansionLevel], 4.0);
-			end
-		end
-	end
-end
-
-function SetCurrentGlueScreenName(name)
-	CURRENT_GLUE_SCREEN = name;
-end
-
-function GetCurrentGlueScreenName()
-	return CURRENT_GLUE_SCREEN;
-end
-
-function SetPendingGlueScreenName(name)
-	PENDING_GLUE_SCREEN = name;
-end
-
-function GetPendingGlueScreenName()
-	return PENDING_GLUE_SCREEN;
-end
-
 function GlueParent_OnLoad(self)
-	local width = GetScreenWidth();
+   	local width = GetScreenWidth();
 	local height = GetScreenHeight();
-	
+
 	if ( width / height > 16 / 9) then
 		local maxWidth = height * 16 / 9;
 		local barWidth = ( width - maxWidth ) / 2;
 		self:ClearAllPoints();
-		self:SetPoint("TOPLEFT", barWidth, 0); 
+		self:SetPoint("TOPLEFT", barWidth, 0);
 		self:SetPoint("BOTTOMRIGHT", -barWidth, 0);
 	end
-	
+
 	self:RegisterEvent("FRAMES_LOADED");
-	self:RegisterEvent("SET_GLUE_SCREEN");
-	self:RegisterEvent("START_GLUE_MUSIC");
-	self:RegisterEvent("DISCONNECTED_FROM_SERVER");
-	self:RegisterEvent("GET_PREFERRED_REALM_INFO");
-	self:RegisterEvent("SERVER_SPLIT_NOTICE");
-	self:RegisterEvent("ACCOUNT_MESSAGES_AVAILABLE");
-	self:RegisterEvent("ACCOUNT_MESSAGES_HEADERS_LOADED");
 	self:RegisterEvent("ACCOUNT_MESSAGES_BODY_LOADED");
-	-- TODO: actually rename GlueParent to UIParent
-	UIParent = self;
+	self:RegisterEvent("LOGIN_STATE_CHANGED");
+	self:RegisterEvent("LOGIN_FAILED");
+	self:RegisterEvent("OPEN_STATUS_DIALOG");
+	self:RegisterEvent("REALM_LIST_UPDATED");
 end
 
-function GlueParent_OnEvent(event, arg1, arg2, arg3)
+function GlueParent_OnEvent(self, event, ...)
 	if ( event == "FRAMES_LOADED" ) then
 		LocalizeFrames();
-	elseif ( event == "SET_GLUE_SCREEN" ) then
-		GlueScreenExit(GetCurrentGlueScreenName(), arg1);
-	elseif ( event == "START_GLUE_MUSIC" ) then
-		local displayedExpansionLevel = GetClientDisplayExpansionLevel();
-		PlayGlueMusic(EXPANSION_GLUE_MUSIC[displayedExpansionLevel]);
-		PlayGlueAmbience(EXPANSION_GLUE_AMBIENCE[displayedExpansionLevel], 4.0);
-	elseif ( event == "DISCONNECTED_FROM_SERVER" ) then
-		TokenEntry_Cancel(TokenEnterDialog);
-		SetGlueScreen("login");
-		GlueDialog_Show(arg1, arg2);
-		AddonList:Hide();
-	elseif ( event == "GET_PREFERRED_REALM_INFO" ) then
-		if( arg1 == 1) then
-			SetPreferredInfo(1);
-		else
-			SetGlueScreen("realmwizard");
-			PlayGlueAmbience(EXPANSION_GLUE_AMBIENCE[GetClientDisplayExpansionLevel()], 4.0);
+		GlueParent_EnsureValidScreen();
+		GlueParent_UpdateDialogs();
+		GlueParent_CheckCinematic();
+		if ( AccountLogin:IsVisible() ) then
+			SetExpansionLogo(AccountLogin.UI.GameLogo, GetClientDisplayExpansionLevel());
 		end
-	elseif ( event == "SERVER_SPLIT_NOTICE" ) then
-		CharacterSelectRealmSplitButton:Show();
-		if ( SERVER_SPLIT_STATE_PENDING == -1 and arg1 == 0 and arg2 == 1 ) then
-			SERVER_SPLIT_SHOW_DIALOG = true;
-		end
-		SERVER_SPLIT_CLIENT_STATE = arg1;
-		SERVER_SPLIT_STATE_PENDING = arg2;
-		SERVER_SPLIT_DATE = arg3;
-	elseif ( event == "ACCOUNT_MESSAGES_AVAILABLE" ) then
---		ACCOUNT_MSG_NUM_AVAILABLE = arg1;
-		ACCOUNT_MSG_HEADERS_LOADED = false;
-		ACCOUNT_MSG_BODY_LOADED = false;
-		ACCOUNT_MSG_CURRENT_INDEX = nil;
-		AccountMsg_LoadHeaders();
-	elseif ( event == "ACCOUNT_MESSAGES_HEADERS_LOADED" ) then
-		ACCOUNT_MSG_HEADERS_LOADED = true;
-		ACCOUNT_MSG_NUM_AVAILABLE = AccountMsg_GetNumUnreadMsgs();
-		ACCOUNT_MSG_CURRENT_INDEX = AccountMsg_GetIndexNextUnreadMsg();
-		if ( ACCOUNT_MSG_NUM_AVAILABLE > 0 ) then
-			AccountMsg_LoadBody( ACCOUNT_MSG_CURRENT_INDEX );
-		end
-	elseif ( event == "ACCOUNT_MESSAGES_BODY_LOADED" ) then
-		ACCOUNT_MSG_BODY_LOADED = true;
+	elseif ( event == "LOGIN_STATE_CHANGED" ) then
+		GlueParent_EnsureValidScreen();
+		GlueParent_UpdateDialogs();
+	elseif ( event == "OPEN_STATUS_DIALOG" ) then
+		local dialog, text = ...;
+		GlueDialog_Show(dialog, text);
+	elseif ( event == "REALM_LIST_UPDATED" ) then
+		RealmList_Update();
 	end
-end
-
--- Glue screen animation handling
-function GlueScreenExit(currentFrame, pendingFrame)
-	if ( currentFrame == "login" and pendingFrame == "charselect" ) then
-		GlueFrameFadeOut(AccountLoginUI, LOGIN_FADE_OUT, GoToPendingGlueScreen);
-		SetPendingGlueScreenName(pendingFrame);
-	else
-		SetGlueScreen(pendingFrame);
-	end
-end
-
-function GoToPendingGlueScreen()
-	SetGlueScreen(GetPendingGlueScreenName());
-end
-
--- Generic fade function
-function GlueFrameFade(frame, timeToFade, mode, finishedFunction)
-	if ( frame ) then
-		frame.fadeTimer = 0;
-		frame.timeToFade = timeToFade;
-		frame.mode = mode;
-		-- finishedFunction is an optional function that is called when the animation is complete
-		if ( finishedFunction ) then
-			frame.finishedFunction = finishedFunction;
-		end
-		tinsert(FADEFRAMES, frame);
-	end
-end
-
--- Fade in function
-function GlueFrameFadeIn(frame, timeToFade, finishedFunction)
-	GlueFrameFade(frame, timeToFade, "IN", finishedFunction);
-end
-
--- Fade out function
-function GlueFrameFadeOut(frame, timeToFade, finishedFunction)
-	GlueFrameFade(frame, timeToFade, "OUT", finishedFunction);
-end
-
--- Function that actually performs the alpha change
-function GlueFrameFadeUpdate(elapsed)
-	local index = 1;
-	while FADEFRAMES[index] do
-		local frame = FADEFRAMES[index];
-		frame.fadeTimer = frame.fadeTimer + elapsed;
-		if ( frame.fadeTimer < frame.timeToFade ) then
-			if ( frame.mode == "IN" ) then
-				frame:SetAlpha(frame.fadeTimer / frame.timeToFade);
-			elseif ( frame.mode == "OUT" ) then
-				frame:SetAlpha((frame.timeToFade - frame.fadeTimer) / frame.timeToFade);
-			end
-		else
-			if ( frame.mode == "IN" ) then
-				frame:SetAlpha(1.0);
-			elseif ( frame.mode == "OUT" ) then
-				frame:SetAlpha(0);
-			end
-			GlueFrameFadeRemoveFrame(frame);
-			if ( frame.finishedFunction ) then
-				frame.finishedFunction();
-				frame.finishedFunction = nil;
-			end
-		end
-		index = index + 1;
-	end
-end
-
-function GlueFrameRemoveFrame(frame, list)
-	local index = 1;
-	while list[index] do
-		if ( frame == list[index] ) then
-			tremove(list, index);
-		end
-		index = index + 1;
-	end
-end
-
-function GlueFrameFadeRemoveFrame(frame)
-	GlueFrameRemoveFrame(frame, FADEFRAMES);
-end
-
-function SetLighting(model, race)
-	--model:SetSequence(0);
-	model:SetCamera(0);
-	local fogInfo = CharModelFogInfo[race];
-	if ( fogInfo ) then
-		model:SetFogColor(fogInfo.r, fogInfo.g, fogInfo.b);
-		model:SetFogNear(0);
-		model:SetFogFar(fogInfo.far);
-	else
-		model:ClearFog();
-    end
-
-    local glowInfo = CharModelGlowInfo[race];
-    if ( glowInfo ) then
-        model:SetGlow(glowInfo);
-    else
-        model:SetGlow(0.3);
-    end
-
-    model:ResetLights();
-end
-
--- Function to get the background tag from a full path ( '..\UI_tagName.m2' )
-function GetBackgroundModelTag(path)
-	local pathUpper = strupper(path);
-	local matchStart;
-	local matchEnd;
-	local tag;
-	matchStart, matchEnd, tag = string.find(pathUpper, 'UI_(%a+).M2');
-	if ( not tag ) then
-		tag = "CHARACTERSELECT"; -- default
-	end
-	return tag;
-end
-
--- Function to set the background model for character select and create screens
-function SetBackgroundModel(model, path)
-	local nameupper = GetBackgroundModelTag(path);
-	if ( model == CharacterCreate ) then
-		SetCharCustomizeBackground(path);
-	else
-		SetCharSelectBackground(path);
-	end
-	if ( GlueAmbienceTracks[nameupper] ) then
-		PlayGlueAmbience(GlueAmbienceTracks[nameupper], 4.0);
-	end
-	if ( ( model == CharacterSelectModel ) and ( string.find(model:GetModel(), 'lowres') == nil ) ) then
-		SetLighting(model, nameupper)
-	else
-		SetLighting(model, "DEFAULT")
-	end
-
-	return nameupper;
-end
-
-function SecondsToTime(seconds, noSeconds)
-	local time = "";
-	local count = 0;
-	local tempTime;
-	seconds = floor(seconds);
-	if ( seconds >= 86400  ) then
-		tempTime = floor(seconds / 86400);
-		time = tempTime.." "..DAYS_ABBR.." ";
-		seconds = mod(seconds, 86400);
-		count = count + 1;
-	end
-	if ( seconds >= 3600  ) then
-		tempTime = floor(seconds / 3600);
-		time = time..tempTime.." "..HOURS_ABBR.." ";
-		seconds = mod(seconds, 3600);
-		count = count + 1;
-	end
-	if ( count < 2 and seconds >= 60  ) then
-		tempTime = floor(seconds / 60);
-		time = time..tempTime.." "..MINUTES_ABBR.." ";
-		seconds = mod(seconds, 60);
-		count = count + 1;
-	end
-	if ( count < 2 and seconds > 0 and not noSeconds ) then
-		seconds = format("%d", seconds);
-		time = time..seconds.." "..SECONDS_ABBR.." ";
-	end
-	return time;
-end
-
-function MinutesToTime(mins, hideDays)
-	local time = "";
-	local count = 0;
-	local tempTime;
-	-- only show days if hideDays is false
-	if ( mins > 1440 and not hideDays ) then
-		tempTime = floor(mins / 1440);
-		time = tempTime..TIME_UNIT_DELIMITER..DAYS_ABBR..TIME_UNIT_DELIMITER;
-		mins = mod(mins, 1440);
-		count = count + 1;
-	end
-	if ( mins > 60  ) then
-		tempTime = floor(mins / 60);
-		time = time..tempTime..TIME_UNIT_DELIMITER..HOURS_ABBR..TIME_UNIT_DELIMITER;
-		mins = mod(mins, 60);
-		count = count + 1;
-	end
-	if ( count < 2 ) then
-		tempTime = mins;
-		time = time..tempTime..TIME_UNIT_DELIMITER..MINUTES_ABBR..TIME_UNIT_DELIMITER;
-		count = count + 1;
-	end
-	return time;
-end
-
-function SetStateRequestInfo( choice )
-	if ( SERVER_SPLIT_CLIENT_STATE ~= choice ) then
-		SERVER_SPLIT_CLIENT_STATE = choice;
-		SetRealmSplitState(choice);
-		RealmSplit_SetChoiceText();
---		RequestRealmSplitInfo();
-	end
-end
-
-function UpgradeAccount()
-	PlaySound("gsLoginNewAccount");
-	LoadURLIndex(2);
-end
-
-function ReactivateAccount()
-	PlaySound("gsLoginNewAccount");
-	LoadURLIndex(22);
-end
-
-function SetLoginScreenModel(model)
-	model:SetCamera(0);
-	model:SetSequence(0);
-	
-	local expansionLevel = GetClientDisplayExpansionLevel();
-	local lowResBG = EXPANSION_LOW_RES_BG[expansionLevel];
-	local highResBG = EXPANSION_HIGH_RES_BG[expansionLevel];
-	local background = GetLoginScreenBackground(highResBG, lowResBG);
-							
-	model:SetModel(background, 1);	
 end
 
 function InGlue()
@@ -512,8 +66,623 @@ function SecureCapsuleGet(name)
 	return _G[name];
 end
 
-function GetTexCoordsByGrid(xOffset, yOffset, textureWidth, textureHeight, gridWidth, gridHeight)
-	local widthPerGrid = gridWidth/textureWidth;
-	local heightPerGrid = gridHeight/textureHeight;
-	return (xOffset-1)*widthPerGrid, (xOffset)*widthPerGrid, (yOffset-1)*heightPerGrid, (yOffset)*heightPerGrid;
+function nop()
+end
+
+-- =============================================================
+-- State/Screen functions
+-- =============================================================
+
+function GlueParent_IsScreenValid(screen)
+	local auroraState, connectedToWoW, wowConnectionState, hasRealmList = C_Login.GetState();
+	if ( screen == "charselect" or screen == "charcreate" or screen == "kioskmodesplash" ) then
+		return auroraState == LE_AURORA_STATE_NONE and (connectedToWoW or wowConnectionState == LE_WOW_CONNECTION_STATE_CONNECTING) and not hasRealmList;
+	elseif ( screen == "realmlist" ) then
+		return hasRealmList;
+	elseif ( screen == "login" ) then
+		return not connectedToWoW and not hasRealmList;
+	else
+		return false;
+	end
+end
+
+function GlueParent_GetBestScreen()
+	local auroraState, connectedToWoW, wowConnectionState, hasRealmList = C_Login.GetState();
+	if ( hasRealmList ) then
+		return "realmlist";
+	elseif ( connectedToWoW ) then
+		return "charselect";
+	else
+		return "login";
+	end
+end
+
+function GlueParent_UpdateDialogs()
+	local auroraState, connectedToWoW, wowConnectionState, hasRealmList, waitingForRealmList = C_Login.GetState();
+
+	if ( auroraState == LE_AURORA_STATE_CONNECTING ) then
+		local isQueued, queuePosition, estimatedSeconds = C_Login.GetLogonQueueInfo();
+		if ( isQueued ) then
+			local queueMessage;
+			if ( estimatedSeconds < 60 ) then
+				queueMessage = string.format(BNET_LOGIN_QUEUE_TIME_LEFT_SECONDS, queuePosition);
+			elseif ( estimatedSeconds > 3600 ) then
+				queueMessage = string.format(BNET_LOGIN_QUEUE_TIME_LEFT_UNKNOWN, queuePosition);
+			else
+				queueMessage = string.format(BNET_LOGIN_QUEUE_TIME_LEFT, queuePosition, estimatedSeconds / 60);
+			end
+
+			GlueDialog_Show("CANCEL", queueMessage);
+		else
+			GlueDialog_Show("CANCEL", LOGIN_STATE_CONNECTING);
+		end
+	elseif ( auroraState == LE_AURORA_STATE_NONE and C_Login.GetLastError() ) then
+		local errorCategory, errorID, localizedString, debugString, errorCodeString = C_Login.GetLastError();
+
+		local isHTML = false;
+		local hasURL = false;
+		local useGenericURL = false;
+
+		--If we didn't get a string from C, look one up in GlueStrings as HTML
+		if ( not localizedString ) then
+			local tag = string.format("%s_ERROR_%d_HTML", errorCategory, errorID);
+			localizedString = _G[tag];
+			if ( localizedString ) then
+				isHTML = true;
+			end
+		end
+
+		--If we didn't get a string from C, look one up in GlueStrings
+		if ( not localizedString ) then
+			local tag = string.format("%s_ERROR_%d", errorCategory, errorID);
+			localizedString = _G[tag];
+		end
+
+		--If we still don't have one, just display a generic error with the ID
+		if ( not localizedString ) then
+			localizedString = _G[errorCategory.."_ERROR_OTHER"];
+			useGenericURL = true;
+		end
+
+		--If we got a debug message, stick it on the end of the errorCodeString
+		if ( debugString ) then
+			errorCodeString = errorCodeString.." [[DBG "..debugString.."]]";
+		end
+
+		--See if we want a custom URL
+		local urlTag = string.format("%s_ERROR_%d_URL", errorCategory, errorID);
+		if ( _G[urlTag] ) then
+			hasURL = true;
+		end
+
+		--Append the errorCodeString
+		if ( isHTML ) then
+			--Pretty hacky...
+			local endOfHTML = "</p></body></html>";
+			localizedString = string.gsub(localizedString, endOfHTML, string.format(" (%s)%s", errorCodeString, endOfHTML));
+		else
+			localizedString = string.format("%s (%s)", localizedString, errorCodeString);
+		end
+
+		if ( isHTML ) then
+			GlueDialog_Show("OKAY_HTML", localizedString);
+		elseif ( hasURL ) then
+			GlueDialog_Show("OKAY_WITH_URL", localizedString, urlTag);
+		elseif ( useGenericURL ) then
+			GlueDialog_Show("OKAY_WITH_GENERIC_URL", localizedString);
+		else
+			GlueDialog_Show("OKAY", localizedString);
+		end
+
+		C_Login.ClearLastError();
+	elseif (  waitingForRealmList ) then
+		GlueDialog_Show("REALM_LIST_IN_PROGRESS");
+	elseif ( wowConnectionState == LE_WOW_CONNECTION_STATE_CONNECTING ) then
+		GlueDialog_Show("CANCEL", GAME_SERVER_LOGIN);
+	elseif ( wowConnectionState == LE_WOW_CONNECTION_STATE_IN_QUEUE ) then
+		local waitPosition, waitMinutes, hasFCM = C_Login.GetWaitQueueInfo();
+
+		if ( hasFCM ) then
+			GlueDialog_Show("QUEUED_WITH_FCM", _G["QUEUE_FCM"]);
+		elseif ( waitMinutes == 0 ) then
+			local queueString = string.format(_G["QUEUE_TIME_LEFT_UNKNOWN"], waitPosition);
+			GlueDialog_Show("QUEUED_NORMAL", queueString);
+		elseif (waitMinutes == 1) then
+			local queueString = string.format(_G["QUEUE_TIME_LEFT_SECONDS"], waitPosition);
+			GlueDialog_Show("QUEUED_NORMAL", queueString);
+		else
+			local queueString = string.format(_G["QUEUE_TIME_LEFT"], waitPosition, waitMinutes);
+			GlueDialog_Show("QUEUED_NORMAL", queueString);
+		end
+	else
+		-- JS_TODO: make it so this only cancels state dialogs, like "Connecting"
+		GlueDialog_Hide();
+	end
+end
+
+function GlueParent_EnsureValidScreen()
+	local currentScreen = GlueParent.currentScreen;
+	if ( not GlueParent_IsScreenValid(currentScreen) ) then
+		local bestScreen = GlueParent_GetBestScreen();
+
+		LogAuroraClient("ae", "Screen invalid. Changing",
+			"changingFrom", currentScreen,
+			"changingTo", bestScreen);
+
+		GlueParent_SetScreen(GlueParent_GetBestScreen());
+	end
+end
+
+local function GlueParent_ChangeScreen(screenInfo, screenTable)
+	LogAuroraClient("ae", "Switching to screen",
+			"screen", screenInfo.frame);
+
+	--Hide all other screens
+	for key, info in pairs(screenTable) do
+		if ( info ~= screenInfo ) then
+			_G[info.frame]:Hide();
+		end
+	end
+
+	--Start music. Have to do this before showing screen in case its OnShow changes screen.
+	local displayedExpansionLevel = GetClientDisplayExpansionLevel();
+	if ( screenInfo.playMusic ) then
+		PlayGlueMusic(EXPANSION_GLUE_MUSIC[displayedExpansionLevel]);
+	end
+	if ( screenInfo.playAmbience ) then
+		PlayGlueAmbience(EXPANSION_GLUE_AMBIENCE[displayedExpansionLevel], 4.0);
+	end
+
+	--Actually show this screen
+	_G[screenInfo.frame]:Show();
+end
+
+function GlueParent_GetCurrentScreen()
+	return GlueParent.currentScreen;
+end
+
+function GlueParent_SetScreen(screen)
+	local screenInfo = GLUE_SCREENS[screen];
+	if ( screenInfo ) then
+		GlueParent.currentScreen = screen;
+
+		--Sometimes, we have to do things we would normally do in OnShow even if the screen doesn't actually
+		--get shown (due to a secondary screen being shown)
+		if ( screenInfo.onAttemptShow ) then
+			screenInfo.onAttemptShow();
+		end
+
+		local suppressScreen = false;
+		if ( GlueParent.currentSecondaryScreen ) then
+			local secondaryInfo = GLUE_SECONDARY_SCREENS[GlueParent.currentSecondaryScreen];
+			if ( secondaryInfo and secondaryInfo.fullScreen ) then
+				suppressScreen = true;
+			end
+		end
+
+		--If there's a full-screen secondary screen showing right now, we'll wait to show this one.
+		--Once the secondary screen hides, we'll be shown.
+		if ( not suppressScreen ) then
+			GlueParent_ChangeScreen(screenInfo, GLUE_SCREENS);
+		end
+	end
+end
+
+function GlueParent_OpenSecondaryScreen(screen)
+	local screenInfo = GLUE_SECONDARY_SCREENS[screen];
+	if ( screenInfo ) then
+		--Close the last secondary screen
+		if ( GlueParent.currentSecondaryScreen ) then
+			GlueParent_CloseSecondaryScreen();
+		end
+
+		GlueParent.currentSecondaryScreen = screen;
+		if ( screenInfo.fullScreen ) then
+			GlueParent.ScreenFrame:Hide();
+
+			--If it's full-screen, hide the main screen
+			if ( GlueParent.currentScreen ) then
+				local mainScreenInfo = GLUE_SCREENS[GlueParent.currentScreen];
+				if ( mainScreenInfo ) then
+					_G[mainScreenInfo.frame]:Hide();
+				end
+			end
+		else
+			GlueParent.ScreenFrame:Show();
+		end
+		if ( screenInfo.showSound ) then
+			PlaySound(screenInfo.showSound);
+		end
+		GlueParent_ChangeScreen(screenInfo, GLUE_SECONDARY_SCREENS);
+	end
+end
+
+function GlueParent_CloseSecondaryScreen()
+	if ( GlueParent.currentSecondaryScreen ) then
+		local screenInfo = GLUE_SECONDARY_SCREENS[GlueParent.currentSecondaryScreen];
+		GlueParent.currentSecondaryScreen = nil;
+
+		--The secondary screen may have started music. Start the primary screen's music if so
+		local primaryScreen = GlueParent.currentScreen;
+		if ( primaryScreen and GLUE_SCREENS[primaryScreen] ) then
+			local displayedExpansionLevel = GetClientDisplayExpansionLevel();
+			if ( GLUE_SCREENS[primaryScreen].playMusic ) then
+				PlayGlueMusic(EXPANSION_GLUE_MUSIC[displayedExpansionLevel]);
+			end
+			if ( GLUE_SCREENS[primaryScreen].playAmbience ) then
+				PlayGlueAmbience(EXPANSION_GLUE_AMBIENCE[displayedExpansionLevel], 4.0);
+			end
+		end
+
+		_G[screenInfo.frame]:Hide();
+
+		--Show the original screen if we hid it. Have to do this last in case it opens a new secondary screen.
+		if ( screenInfo.fullScreen ) then
+			GlueParent.ScreenFrame:Show();
+			if ( GlueParent.currentScreen ) then
+				GlueParent_SetScreen(GlueParent.currentScreen);
+			end
+		end
+	end
+end
+
+function GlueParent_CheckCinematic()
+	local cinematicIndex = tonumber(GetCVar("playIntroMovie"));
+	local displayExpansionLevel = GetClientDisplayExpansionLevel();
+	if ( not cinematicIndex or cinematicIndex <= displayExpansionLevel ) then
+		SetCVar("playIntroMovie", displayExpansionLevel + 1);
+		MovieFrame.version = tonumber(GetCVar("playIntroMovie"));
+		GlueParent_OpenSecondaryScreen("movie");
+	end
+end
+
+-- =============================================================
+-- Model functions
+-- =============================================================
+
+function SetLoginScreenModel(model)
+
+	local expansionLevel = GetClientDisplayExpansionLevel();
+	local lowResBG = EXPANSION_LOW_RES_BG[expansionLevel];
+	local highResBG = EXPANSION_HIGH_RES_BG[expansionLevel];
+	local background = GetLoginScreenBackground(highResBG, lowResBG);
+
+	model:SetModel(background, true);
+	model:SetCamera(0);
+	model:SetSequence(0);
+end
+
+local function ResetLighting(model)
+	--model:SetSequence(0);
+	model:SetCamera(0);
+	model:ClearFog();
+	model:SetGlow(0.3);
+
+    model:ResetLights();
+end
+
+local function UpdateLighting(model)
+	-- TODO: Remove this and CHAR_MODEL_FOG_INFO and bake fog into models as desired.
+    local fogData = CHAR_MODEL_FOG_INFO[GetCurrentGlueTag()];
+    if fogData then
+    	model:SetFogNear(0);
+    	model:SetFogFar(fogData.far);
+    	model:SetFogColor(fogData.r, fogData.g, fogData.b);
+    end
+end
+
+local glueScreenTags =
+{
+	["charselect"] =
+	{
+		["PANDAREN"] = "PANDARENCHARACTERSELECT",
+	},
+
+	["charcreate"] =
+	{
+		-- Classes
+		["DEATHKNIGHT"] = true,
+		["DEMONHUNTER"] = true,
+
+		-- Races
+		["PANDAREN"] = true,
+
+		-- Factions
+		["HORDE"] = true,
+		["ALLIANCE"] = true,
+		["NEUTRAL"] = true,
+	},
+
+	["default"] =
+	{
+		-- Classes
+		["DEATHKNIGHT"] = true,
+		["DEMONHUNTER"] = true,
+
+		-- Races
+		["HUMAN"] = true,
+		["ORC"] = true,
+		["TROLL"] = true,
+		["DWARF"] = true,
+		["GNOME"] = true,
+		["TAUREN"] = true,
+		["SCOURGE"] = true,
+		["NIGHTELF"] = true,
+		["DRAENEI"] = true,
+		["BLOODELF"] = true,
+		["GOBLIN"] = true,
+		["WORGEN"] = true,
+	},
+};
+
+local function GetGlueTagFromKey(subTable, key)
+	if ( subTable and key ) then
+		local value = subTable[key];
+		local valueType = type(value);
+		if ( valueType == "boolean" ) then
+			return key;
+		elseif ( valueType == "string" ) then
+			return value;
+		end
+	end
+end
+
+local function UpdateGlueTagWithOrdering(subTable, ...)
+	for i = 1, select("#", ...) do
+		local tag = GetGlueTagFromKey(subTable, select(i, ...));
+		if ( tag ) then
+			GlueParent.currentTag = tag;
+			return true;
+		end
+	end
+
+	return false;
+end
+
+local function UpdateGlueTag()
+	local currentScreen = GlueParent_GetCurrentScreen();
+
+	local _, race, class, faction, currentTag;
+
+	-- Determine which API to use to get character information
+	if ( currentScreen == "charselect") then
+		class = select(4, GetCharacterInfo(GetCharacterSelection()));
+		race = select(2, GetCharacterRace(GetCharacterSelection()));
+		faction = ""; -- Don't need faction for character selection, its currently irrelevant
+
+	elseif ( currentScreen == "charcreate" ) then
+		_, class = GetSelectedClass();
+		_, race = GetNameForRace();
+		_, faction = GetFactionForRace(GetSelectedRace());
+	end
+
+	-- Once valid information is available, determine the current tag
+	if ( race and class and faction ) then
+		race, class, faction = strupper(race), strupper(class), strupper(faction);
+
+		-- Try lookup from current screen (current screen may have fixed bg's)
+		if ( UpdateGlueTagWithOrdering(glueScreenTags[currentScreen], class, race, faction) ) then
+			return;
+		end
+
+		-- Try lookup from defaults
+		if ( UpdateGlueTagWithOrdering(glueScreenTags["default"], class, race, faction) ) then
+			return;
+		end
+	end
+
+	-- Fallback default value for the current glue tag
+	GlueParent.currentTag = "CHARACTERSELECT";
+end
+
+function GetCurrentGlueTag()
+	return GlueParent.currentTag;
+end
+
+local function PlayGlueAmbienceFromTag()
+	PlayGlueAmbience(GLUE_AMBIENCE_TRACKS[GetCurrentGlueTag()], 4.0);
+end
+
+function GlueParent_DeathKnightButtonSwapMultiTexture(self)
+	local textureBase;
+	local highlightBase = "Interface\\Glues\\Common\\Glue-Panel-Button-Highlight";
+
+	if ( not self:IsEnabled() ) then
+		textureBase = "Interface\\Glues\\Common\\Glue-Panel-Button-Disabled";
+	elseif ( self.down ) then
+		textureBase = "Interface\\Glues\\Common\\Glue-Panel-Button-Down";
+	else
+		textureBase = "Interface\\Glues\\Common\\Glue-Panel-Button-Up";
+	end
+
+	local currentGlueTag = GetCurrentGlueTag();
+
+	if ( self.currentGlueTag ~= currentGlueTag or self.textureBase ~= textureBase ) then
+		self.currentGlueTag = currentGlueTag;
+		self.textureBase = textureBase;
+
+		if ( currentGlueTag == "DEATHKNIGHT" ) then
+			local suffix = self:IsEnabled() and "-Blue" or "";
+			local texture = textureBase..suffix;
+			local highlight = highlightBase..suffix;
+			self.Left:SetTexture(texture);
+			self.Middle:SetTexture(texture);
+			self.Right:SetTexture(texture);
+			self:SetHighlightTexture(highlight);
+		else
+			self.Left:SetTexture(textureBase);
+			self.Middle:SetTexture(textureBase);
+			self.Right:SetTexture(textureBase);
+			self:SetHighlightTexture(highlightBase);
+		end
+	end
+end
+
+function GlueParent_DeathKnightButtonSwapSingleTexture(self)
+	local currentTag = GetCurrentGlueTag();
+	if ( self.currentGlueTag ~= currentTag ) then
+		self.currentGlueTag = currentTag;
+
+		if (currentTag == "DEATHKNIGHT") then
+			-- Not currently needed, but could support other swaps here.
+			self:SetNormalTexture("Interface\\Glues\\Common\\Glue-Panel-Button-Up-Blue");
+			self:SetPushedTexture("Interface\\Glues\\Common\\Glue-Panel-Button-Down-Blue");
+			self:SetHighlightTexture("Interface\\Glues\\Common\\Glue-Panel-Button-Highlight-Blue");
+		else
+			self:SetNormalTexture("Interface\\Glues\\Common\\Glue-Panel-Button-Up");
+			self:SetPushedTexture("Interface\\Glues\\Common\\Glue-Panel-Button-Down");
+			self:SetHighlightTexture("Interface\\Glues\\Common\\Glue-Panel-Button-Highlight");
+		end
+	end
+end
+
+function GlueParent_DeathKnightButtonSwap(self)
+	if ( self.Left ) then
+		GlueParent_DeathKnightButtonSwapMultiTexture(self);
+	else
+		GlueParent_DeathKnightButtonSwapSingleTexture(self);
+	end
+end
+
+-- Function to set the background model for character select and create screens
+function SetBackgroundModel(model, path)
+	if ( model == CharacterCreate ) then
+		SetCharCustomizeBackground(path);
+	else
+		SetCharSelectBackground(path);
+	end
+
+	UpdateGlueTag();
+	PlayGlueAmbienceFromTag();
+
+	ResetLighting(model);
+	UpdateLighting(model);
+end
+
+-- =============================================================
+-- Buttons
+-- =============================================================
+
+function GlueParent_ShowOptionsScreen()
+	GlueParent_OpenSecondaryScreen("options");
+end
+
+function GlueParent_ShowCinematicsScreen()
+	local numMovies = GetClientDisplayExpansionLevel() + 1;
+	if ( numMovies == 1 ) then
+		MovieFrame.version = 1;
+		GlueParent_OpenSecondaryScreen("movie");
+	else
+		GlueParent_OpenSecondaryScreen("cinematics");
+	end
+end
+
+function GlueParent_ShowCreditsScreen()
+	GlueParent_OpenSecondaryScreen("credits");
+end
+
+-- =============================================================
+-- Utils
+-- =============================================================
+
+function SetExpansionLogo(texture, expansionLevel)
+	if ( EXPANSION_LOGOS[expansionLevel].texture ) then
+		texture:SetTexture(EXPANSION_LOGOS[expansionLevel].texture);
+		texture:Show();
+	elseif ( EXPANSION_LOGOS[expansionLevel].atlas ) then
+		texture:SetAtlas(EXPANSION_LOGOS[expansionLevel].atlas);
+		texture:Show();
+	else
+		texture:Hide();
+	end
+end
+
+function UpgradeAccount()
+	PlaySound("gsLoginNewAccount");
+	LoadURLIndex(2);
+end
+
+function MinutesToTime(mins, hideDays)
+	local time = "";
+	local count = 0;
+	local tempTime;
+	-- only show days if hideDays is false
+	if ( mins > 1440 and not hideDays ) then
+		tempTime = floor(mins / 1440);
+		time = TIME_UNIT_DELIMITER .. format(DAYS_ABBR, tempTime);
+		mins = mod(mins, 1440);
+		count = count + 1;
+	end
+	if ( mins > 60  ) then
+		tempTime = floor(mins / 60);
+		time = time .. TIME_UNIT_DELIMITER .. format(HOURS_ABBR, tempTime);
+		mins = mod(mins, 60);
+		count = count + 1;
+	end
+	if ( count < 2 ) then
+		tempTime = mins;
+		time = time .. TIME_UNIT_DELIMITER .. format(MINUTES_ABBR, tempTime);
+		count = count + 1;
+	end
+	return time;
+end
+
+function CheckSystemRequirements( previousCheck )
+	if ( not previousCheck  ) then
+		if ( not IsCPUSupported() ) then
+			GlueDialog_Show("SYSTEM_INCOMPATIBLE_SSE");
+			return;
+		end
+		previousCheck = nil;
+	end
+
+	if ( not previousCheck or previousCheck == "SSE" ) then
+		if ( not IsShaderModelSupported() ) then
+			GlueDialog_Show("FIXEDFUNCTION_UNSUPPORTED");
+			return;
+		end
+		previousCheck = nil;
+	end
+
+	if ( not previousCheck or previousCheck == "SHADERMODEL" ) then
+		if ( VideoDeviceState() == 1 ) then
+			GlueDialog_Show("DEVICE_BLACKLISTED");
+			return;
+		end
+		previousCheck = nil;
+	end
+
+	if ( not previousCheck or previousCheck == "DEVICE" ) then
+		if ( VideoDriverState() == 2 ) then
+			GlueDialog_Show("DRIVER_OUTOFDATE");
+			return;
+		end
+		previousCheck = nil;
+	end
+
+	if ( not previousCheck or previousCheck == "DRIVER_OOD" ) then
+		if ( VideoDriverState() == 1 ) then
+			GlueDialog_Show("DRIVER_BLACKLISTED");
+			return;
+		end
+		previousCheck = nil;
+	end
+
+	if ( not previousCheck or previousCheck == "DRIVER" ) then
+		if ( not WillShaderModelBeSupported() ) then
+			GlueDialog_Show("SHADER_MODEL_TO_BE_UNSUPPORTED");
+			return;
+		end
+		previousCheck = nil;
+	end
+end
+-- =============================================================
+-- Backwards Compatibility
+-- =============================================================
+function getglobal(var)
+	return _G[var];
+end
+
+function setglobal(var, val)
+	_G[var] = val;
 end

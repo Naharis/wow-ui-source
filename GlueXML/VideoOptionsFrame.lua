@@ -2,7 +2,7 @@
 
 function VideoOptionsFrame_Toggle ()
 	if ( VideoOptionsFrame:IsShown() ) then
-		VideoOptionsFrame:Hide();
+		GlueParent_CloseSecondaryScreen();
 	else
 		VideoOptionsFrame:Show();
 	end
@@ -42,7 +42,9 @@ function VideoOptionsFrameOkay_OnClick (self, button, down, apply)
 end
 
 function VideoOptionsFrameCancel_OnClick (self, button)
-	OptionsFrameCancel_OnClick(VideoOptionsFrame);
+	if ( VideoOptionsFrameApply:IsEnabled() ) then
+		OptionsFrameCancel_OnClick(VideoOptionsFrame);
+	end
 	VideoOptionsFrame_Toggle();
 end
 
